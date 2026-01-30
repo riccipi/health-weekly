@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		8BF071A52F2B476E007AA73D /* Health_Weekly.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Health_Weekly.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8BF071A52F2B476E007AA73D /* Hearty.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Hearty.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -40,7 +40,7 @@
 		8BF071A62F2B476E007AA73D /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				8BF071A52F2B476E007AA73D /* Health_Weekly.app */,
+				8BF071A52F2B476E007AA73D /* Hearty.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -48,9 +48,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		8BF071A42F2B476E007AA73D /* Health_Weekly */ = {
+		8BF071A42F2B476E007AA73D /* Hearty */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 8BF071B02F2B476F007AA73D /* Build configuration list for PBXNativeTarget "Health_Weekly" */;
+			buildConfigurationList = 8BF071B02F2B476F007AA73D /* Build configuration list for PBXNativeTarget "Hearty" */;
 			buildPhases = (
 				8BF071A12F2B476E007AA73D /* Sources */,
 				8BF071A22F2B476E007AA73D /* Frameworks */,
@@ -63,11 +63,11 @@
 			fileSystemSynchronizedGroups = (
 				8BF071A72F2B476E007AA73D /* Health_Weekly */,
 			);
-			name = Health_Weekly;
+			name = Hearty;
 			packageProductDependencies = (
 			);
 			productName = Health_Weekly;
-			productReference = 8BF071A52F2B476E007AA73D /* Health_Weekly.app */;
+			productReference = 8BF071A52F2B476E007AA73D /* Hearty.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -85,7 +85,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 8BF071A02F2B476E007AA73D /* Build configuration list for PBXProject "Health_Weekly" */;
+			buildConfigurationList = 8BF071A02F2B476E007AA73D /* Build configuration list for PBXProject "Hearty" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -99,7 +99,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				8BF071A42F2B476E007AA73D /* Health_Weekly */,
+				8BF071A42F2B476E007AA73D /* Hearty */,
 			);
 		};
 /* End PBXProject section */
@@ -249,15 +249,20 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Health_Weekly/Health_Weekly.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PLG4T6NQE8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Health-Weekly-Info.plist";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "L’app utilizza i dati di Salute (VO2max, frequenza cardiaca, allenamenti e calorie attive) per generare un report settimanale personale.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -280,15 +285,20 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Health_Weekly/Health_Weekly.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PLG4T6NQE8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Health-Weekly-Info.plist";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "L’app utilizza i dati di Salute (VO2max, frequenza cardiaca, allenamenti e calorie attive) per generare un report settimanale personale.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -309,7 +319,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		8BF071A02F2B476E007AA73D /* Build configuration list for PBXProject "Health_Weekly" */ = {
+		8BF071A02F2B476E007AA73D /* Build configuration list for PBXProject "Hearty" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8BF071AE2F2B476F007AA73D /* Debug */,
@@ -318,7 +328,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		8BF071B02F2B476F007AA73D /* Build configuration list for PBXNativeTarget "Health_Weekly" */ = {
+		8BF071B02F2B476F007AA73D /* Build configuration list for PBXNativeTarget "Hearty" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8BF071B12F2B476F007AA73D /* Debug */,
