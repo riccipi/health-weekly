@@ -10,6 +10,9 @@ import UserNotifications
 
 struct ContentView: View {
     
+    @AppStorage("weeksIncluded")
+    private var weeksIncluded: Int = 1
+    
     @AppStorage("lastWeeklyReportSentAt")
     private var lastReportSentAt: Double = 0
     
@@ -37,6 +40,13 @@ struct ContentView: View {
                 .font(.footnote)
                 .foregroundColor(.secondary)
            
+            Picker("Weeks included", selection: $weeksIncluded) {
+                ForEach(1...4, id: \.self) { value in
+                    Text("\(value)").tag(value)
+                }
+            }
+            .pickerStyle(.segmented)
+            
             Button("Invio manuale") {
                 showSendConfirmation = true
             }

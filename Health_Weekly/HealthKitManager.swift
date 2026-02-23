@@ -32,45 +32,72 @@ final class HealthKitManager {
         }
     }
     
-    func fetchRestingHRThisWeek(completion: @escaping (Double?) -> Void) {
-        let type = HKQuantityType.quantityType(forIdentifier: .restingHeartRate)!
-        let range = isoWeekRange(for: Date())
-        let predicate = HKQuery.predicateForSamples(withStart: range.start, end: range.end)
+    func fetchRestingHRThisWeek(
+        start: Date,
+        end: Date,
+        completion: @escaping (Double?) -> Void
+    ) {
 
-        let q = HKSampleQuery(
-            sampleType: type,
-            predicate: predicate,
-            limit: HKObjectQueryNoLimit,
-            sortDescriptors: nil
-        ) { _, samples, _ in
-            let values = (samples as? [HKQuantitySample])?.map {
-                $0.quantity.doubleValue(for: .count().unitDivided(by: .minute()))
-            } ?? []
-
-            let mean = values.isEmpty ? nil : values.reduce(0,+) / Double(values.count)
-            DispatchQueue.main.async { completion(mean) }
+        guard let type = HKQuantityType.quantityType(forIdentifier: .restingHeartRate) else {
+            completion(nil)
+            return
         }
 
-        store.execute(q)
-    }
+        let predicate = HKQuery.predicateForSamples(
+            withStart: start,
+            end: end,
+            options: .strictStartDate
+        )
 
-    func fetchWorkoutsThisWeek(completion: @escaping ([HKWorkout]) -> Void) {
-        let type = HKObjectType.workoutType()
-        let range = isoWeekRange(for: Date())
-        let predicate = HKQuery.predicateForSamples(withStart: range.start, end: range.end)
-
-        let q = HKSampleQuery(
+        let query = HKSampleQuery(
             sampleType: type,
             predicate: predicate,
             limit: HKObjectQueryNoLimit,
             sortDescriptors: nil
         ) { _, samples, _ in
-            DispatchQueue.main.async {
-                completion(samples as? [HKWorkout] ?? [])
+
+            guard let samples = samples as? [HKQuantitySample],
+                  !samples.isEmpty else {
+                completion(nil)
+                return
             }
+
+            let values = samples.map {
+                $0.quantity.doubleValue(for: HKUnit.count().unitDivided(by: .minute()))
+            }
+
+            let avg = values.reduce(0, +) / Double(values.count)
+            completion(avg)
         }
 
-        store.execute(q)
+        store.execute(query)
+    }
+    
+    func fetchWorkoutsThisWeek(
+        start: Date,
+        end: Date,
+        completion: @escaping ([HKWorkout]) -> Void
+    ) {
+
+        let type = HKObjectType.workoutType()
+
+        let predicate = HKQuery.predicateForSamples(
+            withStart: start,
+            end: end,
+            options: .strictStartDate
+        )
+
+        let query = HKSampleQuery(
+            sampleType: type,
+            predicate: predicate,
+            limit: HKObjectQueryNoLimit,
+            sortDescriptors: nil
+        ) { _, samples, _ in
+
+            completion(samples as? [HKWorkout] ?? [])
+        }
+
+        store.execute(query)
     }
 
     func verdict(minutesHigh: Double, hrMax: Double?) -> String {
@@ -147,10 +174,18 @@ extension HealthKitManager {
 
 extension HealthKitManager {
 
-    func fetchVO2MaxThisWeek(completion: @escaping (Double?, Double?) -> Void) {
+    func fetchVO2MaxThisWeek(
+        start: Date,
+        end: Date,
+        completion: @escaping (Double?, Double?) -> Void
+    ) {
         let vo2 = HKQuantityType.quantityType(forIdentifier: .vo2Max)!
         let range = isoWeekRange(for: Date())
-        let predicate = HKQuery.predicateForSamples(withStart: range.start, end: range.end)
+        let predicate = HKQuery.predicateForSamples(
+            withStart: start,
+            end: end,
+            options: .strictStartDate
+        )
 
         let sort = NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: true)
 
@@ -172,7 +207,8 @@ extension HealthKitManager {
         end: Date,
         completion: @escaping (Int) -> Void
     ) {
-        guard let stepType = HKQuantityType.quantityType(forIdentifier: .stepCount) else {
+
+        guard let type = HKQuantityType.quantityType(forIdentifier: .stepCount) else {
             completion(0)
             return
         }
@@ -184,15 +220,13 @@ extension HealthKitManager {
         )
 
         let query = HKStatisticsQuery(
-            quantityType: stepType,
+            quantityType: type,
             quantitySamplePredicate: predicate,
             options: .cumulativeSum
         ) { _, result, _ in
-            let total = result?
-                .sumQuantity()?
-                .doubleValue(for: HKUnit.count()) ?? 0
 
-            completion(Int(total))
+            let sum = result?.sumQuantity()?.doubleValue(for: .count()) ?? 0
+            completion(Int(sum))
         }
 
         store.execute(query)
@@ -201,18 +235,34 @@ extension HealthKitManager {
 
 extension HealthKitManager {
 
-    func fetchActiveKcalThisWeek(completion: @escaping (Double) -> Void) {
-        let energy = HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned)!
-        let range = isoWeekRange(for: Date())
-        let predicate = HKQuery.predicateForSamples(withStart: range.start, end: range.end)
+    func fetchActiveKcalThisWeek(
+        start: Date,
+        end: Date,
+        completion: @escaping (Double) -> Void
+    ) {
 
-        let q = HKStatisticsQuery(quantityType: energy,
-                                  quantitySamplePredicate: predicate,
-                                  options: .cumulativeSum) { _, stats, _ in
-            let kcal = stats?.sumQuantity()?.doubleValue(for: .kilocalorie()) ?? 0
-            DispatchQueue.main.async { completion(kcal) }
+        guard let type = HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned) else {
+            completion(0)
+            return
         }
-        store.execute(q)
+
+        let predicate = HKQuery.predicateForSamples(
+            withStart: start,
+            end: end,
+            options: .strictStartDate
+        )
+
+        let query = HKStatisticsQuery(
+            quantityType: type,
+            quantitySamplePredicate: predicate,
+            options: .cumulativeSum
+        ) { _, result, _ in
+
+            let sum = result?.sumQuantity()?.doubleValue(for: .kilocalorie()) ?? 0
+            completion(sum)
+        }
+
+        store.execute(query)
     }
 }
 

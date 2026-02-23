@@ -22,6 +22,9 @@ struct Health_WeeklyApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .onAppear {
+                    scheduleNextWeeklyTask()
+                }
         }
     }
 }
@@ -40,7 +43,8 @@ func registerBackgroundTask() {
 func handleWeeklyTask(task: BGProcessingTask) {
 
     scheduleNextWeeklyTask()
-
+    print("🚀 Weekly background task STARTED at \(Date())")
+    
     let queue = OperationQueue()
     queue.maxConcurrentOperationCount = 1
 
@@ -64,32 +68,42 @@ func runWeeklyCheckAndSend() {
     hk.requestAuthorization { ok in
         guard ok else { return }
         
-        buildWeeklyReport { report in
+        let weeksIncluded = max(UserDefaults.standard.integer(forKey: "weeksIncluded"), 1)
+
+        buildWeeklyReport(weeksIncluded: weeksIncluded) { reports in
+
+            let weeksArray: [[String: Any]] = reports.map { report in
+                return [
+                    "year": report.year,
+                    "week": report.week,
+                    "vo2maxMean": report.vo2maxMean as Any,
+                    "vo2maxLast": report.vo2maxLast as Any,
+                    "restingHR": report.restingHR as Any,
+                    "activeKcal": report.activeKcal,
+                    "workoutHRMean": report.workoutHRMean as Any,
+                    "workoutHRMax": report.workoutHRMax as Any,
+                    "minutesHigh": report.minutesHigh,
+                    "verdict": report.verdict,
+                    "stepsWeeklyTotal": report.stepsWeeklyTotal,
+                    "stepsDailyAverage": report.stepsDailyAverage
+                ]
+            }
+
             let payload: [String: Any] = [
-                "year": report.year,
-                "week": report.week,
-                "vo2maxMean": report.vo2maxMean as Any,
-                "vo2maxLast": report.vo2maxLast as Any,
-                "restingHR": report.restingHR as Any,
-                "activeKcal": report.activeKcal,
-                "workoutHRMean": report.workoutHRMean as Any,
-                "workoutHRMax": report.workoutHRMax as Any,
-                "minutesHigh": report.minutesHigh,
-                "stepsWeeklyTotal": report.stepsWeeklyTotal,
-                "stepsDailyAverage": report.stepsDailyAverage,
-                "verdict": report.verdict
+                "weeksIncluded": weeksIncluded,
+                "generatedAt": Date().timeIntervalSince1970,
+                "weeks": weeksArray
             ]
-            
+
             sendWeeklyReport(payload)
+
             notifyWeeklyReportSent()
-            DispatchQueue.main.async {
-                UserDefaults.standard.set(
-                    Date().timeIntervalSince1970,
-                    forKey: lastReportSentKey
-                )
-            }    }
+            UserDefaults.standard.set(
+                Date().timeIntervalSince1970,
+                forKey: lastReportSentKey
+            )
+        }    }
     }
-}
 
 func scheduleNextWeeklyTask() {
 
@@ -112,6 +126,7 @@ func scheduleNextWeeklyTask() {
         )
 
     try? BGTaskScheduler.shared.submit(request)
+    print("🟢 Weekly background task submitted")
 }
 
 class NotificationDelegate: NSObject, UNUserNotificationCenterDelegate {
