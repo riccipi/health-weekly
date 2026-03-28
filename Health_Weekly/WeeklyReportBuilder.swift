@@ -87,6 +87,7 @@ func buildWeeklyReport(
         completion(reports.sorted { $0.week > $1.week })
     }
 }
+
 /*
 func buildWeeklyReport(
     weeksIncluded: Int,

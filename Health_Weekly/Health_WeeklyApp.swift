@@ -29,8 +29,6 @@ struct Health_WeeklyApp: App {
     }
 }
 
-
-
 func registerBackgroundTask() {
     BGTaskScheduler.shared.register(
         forTaskWithIdentifier: "com.riccardo.healthweekly",

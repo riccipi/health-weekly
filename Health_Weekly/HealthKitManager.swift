@@ -266,3 +266,91 @@ extension HealthKitManager {
     }
 }
 
+extension HealthKitManager {
+    func fetchRecentWorkouts(
+        limit: Int = 5,
+        completion: @escaping ([HKWorkout]) -> Void
+    ) {
+        
+        let type = HKObjectType.workoutType()
+        
+        let sort = NSSortDescriptor(
+            key: HKSampleSortIdentifierEndDate,
+            ascending: false
+        )
+        
+        let query = HKSampleQuery(
+            sampleType: type,
+            predicate: nil,
+            limit: limit,
+            sortDescriptors: [sort]
+        ) { _, samples, _ in
+            
+            completion(samples as? [HKWorkout] ?? [])
+        }
+        
+        store.execute(query)
+    }
+}
+
+extension HealthKitManager {
+    func fetchHeartRateForWorkout(
+        workout: HKWorkout,
+        completion: @escaping ([(date: Date, bpm: Double)]) -> Void
+    ) {
+        
+        guard let type = HKQuantityType.quantityType(forIdentifier: .heartRate) else {
+            completion([])
+            return
+        }
+        
+        let predicate = HKQuery.predicateForSamples(
+            withStart: workout.startDate,
+            end: workout.endDate,
+            options: .strictStartDate
+        )
+        
+        let sort = NSSortDescriptor(
+            key: HKSampleSortIdentifierStartDate,
+            ascending: true
+        )
+        
+        let query = HKSampleQuery(
+            sampleType: type,
+            predicate: predicate,
+            limit: HKObjectQueryNoLimit,
+            sortDescriptors: [sort]
+        ) { _, samples, _ in
+            
+            guard let samples = samples as? [HKQuantitySample] else {
+                completion([])
+                return
+            }
+            
+            let results = samples.map {
+                (
+                    date: $0.startDate,
+                    bpm: $0.quantity.doubleValue(
+                        for: HKUnit.count().unitDivided(by: .minute())
+                    )
+                )
+            }
+            
+            completion(results)
+        }
+        
+        store.execute(query)
+    }
+}
+
+extension HKWorkoutActivityType {
+    var name: String {
+        switch self {
+        case .running: return "Running"
+        case .walking: return "Walking"
+        case .cycling: return "Cycling"
+        case .traditionalStrengthTraining: return "Strength"
+        default: return "Other"
+        }
+    }
+}

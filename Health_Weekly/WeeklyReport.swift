@@ -54,3 +54,8 @@ struct WeeklyReport: Codable {
         self.verdict = verdict
     }
 }
+
+struct HeartRateSample: Codable {
+    let timestamp: Double
+    let bpm: Double
+}

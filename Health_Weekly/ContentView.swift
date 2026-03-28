@@ -7,6 +7,7 @@
 
 import SwiftUI
 import UserNotifications
+import HealthKit
 
 struct ContentView: View {
     
@@ -19,6 +20,8 @@ struct ContentView: View {
     let hk = HealthKitManager()
     
     @State private var showSendConfirmation = false
+    @State private var workouts: [HKWorkout] = []
+    @State private var selectedWorkout: HKWorkout?
     
     var body: some View {
         VStack(spacing: 16) {
@@ -60,6 +63,45 @@ struct ContentView: View {
                 }
 
                 Button("Annulla", role: .cancel) {}
+            }
+            
+            List(workouts, id: \.self) { workout in
+                Button {
+                    selectedWorkout = workout
+
+                    hk.fetchHeartRateForWorkout(workout: workout) { samples in
+
+                        let payload = samples.map {
+                            HeartRateSample(
+                                timestamp: $0.date.timeIntervalSince1970,
+                                bpm: $0.bpm
+                            )
+                        }
+                        sendHeartRateToBackend(payload)
+                    }
+
+                } label: {
+                    VStack(alignment: .leading) {
+                        Text(workout.workoutActivityType.name)
+                            .font(.headline)
+
+                        Text(workout.startDate.formatted())
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+            }
+            
+            .onAppear {
+                hk.requestAuthorization { ok in
+                    guard ok else { return }
+
+                    hk.fetchRecentWorkouts { w in
+                        DispatchQueue.main.async {
+                            self.workouts = w
+                        }
+                    }
+                }
             }
             
         }
